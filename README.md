@@ -9,8 +9,8 @@ Plugin de meta-ferramentas para criar e customizar sistemas agenticos judiciais 
 Tres comandos e o sistema inteiro esta funcionando:
 
 ```
-/plugin marketplace add georgemarmelstein/superjurista-marketplace
-/plugin install superjurista-dev@georgemarmelstein-superjurista-marketplace
+/plugin marketplace add thirsodelcorso/superjurista-marketplace
+/plugin install superjurista-dev@thirsodelcorso-superjurista-marketplace
 /instalar-superjurista
 ```
 
@@ -18,12 +18,12 @@ Tres comandos e o sistema inteiro esta funcionando:
 
 1. **Adicionar o marketplace** -- registra o repositorio de plugins do SuperJurista:
    ```
-   /plugin marketplace add georgemarmelstein/superjurista-marketplace
+   /plugin marketplace add thirsodelcorso/superjurista-marketplace
    ```
 
 2. **Instalar o plugin** -- baixa as meta-ferramentas e o scaffold:
    ```
-   /plugin install superjurista-dev@georgemarmelstein-superjurista-marketplace
+   /plugin install superjurista-dev@thirsodelcorso-superjurista-marketplace
    ```
 
 3. **Instalar o sistema no projeto** -- copia agentes, pipelines, skills e MCPs para `.claude/`:
@@ -38,7 +38,7 @@ Digite `/plugin` para abrir o gerenciador visual com abas (Discover, Installed, 
 ### Opcao 3: Desenvolvimento local
 
 ```bash
-git clone https://github.com/georgemarmelstein/superjurista-dev.git
+git clone https://github.com/thirsodelcorso/superjurista-dev.git
 claude --plugin-dir ./superjurista-dev
 ```
 
@@ -52,9 +52,9 @@ Depois, dentro da sessao: `/instalar-superjurista`
 | Adicionar marketplace | `/plugin marketplace add owner/repo` |
 | Instalar plugin | `/plugin install plugin@marketplace` |
 | Listar instalados | `/plugin` > aba Installed |
-| Desinstalar | `/plugin uninstall superjurista-dev@georgemarmelstein-superjurista-marketplace` |
-| Desativar (sem remover) | `/plugin disable superjurista-dev@georgemarmelstein-superjurista-marketplace` |
-| Reativar | `/plugin enable superjurista-dev@georgemarmelstein-superjurista-marketplace` |
+| Desinstalar | `/plugin uninstall superjurista-dev@thirsodelcorso-superjurista-marketplace` |
+| Desativar (sem remover) | `/plugin disable superjurista-dev@thirsodelcorso-superjurista-marketplace` |
+| Reativar | `/plugin enable superjurista-dev@thirsodelcorso-superjurista-marketplace` |
 | Recarregar apos instalar | `/reload-plugins` |
 
 ### Escopo da instalacao

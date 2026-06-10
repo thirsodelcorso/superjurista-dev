@@ -1,7 +1,7 @@
 ---
 description: Analisa um processo cível (PDF dos autos) e gera o Parecer do Jurista Experiente
 argument-hint: <caminho-pdf-ou-pasta-do-processo>
-allowed-tools: Read Write Task TodoWrite Bash Glob
+allowed-tools: Read Write Task TodoWrite Bash Glob AskUserQuestion
 ---
 
 # Orquestrador: Analisar Processo (Parecer do Jurista Experiente)
@@ -47,7 +47,21 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
     Se um sinalizador obrigatório não for encontrado: reportar a etapa, regenerar com sufixo
     de correção (máx 2x) e parar se persistir.
   </se_checkpoint_falha>
+  <se_jusmcp_indisponivel>
+    Se o JusMCP não estiver configurado/acessível (pré-requisito — ver project-claude.md):
+    NÃO interromper o pipeline. A etapa 6 degrada formalmente: o pesquisador-jusmcp produz
+    saída com status "PESQUISA INDISPONÍVEL" e toda jurisprudência do parecer sai marcada
+    [VERIFY]. O parecer DEVE registrar o aviso: "Jurisprudência não verificada — JusMCP
+    indisponível. Conferência manual obrigatória."
+  </se_jusmcp_indisponivel>
 </contingencias>
+
+<aviso_privacidade>
+  AVISO OPERACIONAL (LGPD/segredo de justiça): o texto extraído dos autos é injetado no
+  contexto do modelo de linguagem para análise. Não use este pipeline em processos sob
+  segredo de justiça sem avaliar a política de tratamento de dados aplicável. Os artefatos
+  gerados ficam em data/processos/ (local, não versionado — ver .gitignore).
+</aviso_privacidade>
 
 <contratos_dados>
   | # | Etapa | Entrada | Saída | Agent/Skill |
@@ -58,7 +72,7 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
   | 3 | Fase | linha-tempo | $NUMERO-fase.md | identificador-fase |
   | 4 | Prova | $NUMERO.txt | $NUMERO-probatica.md | detector-lacunas |
   | 5 | Teses | relatório+fase+prova | $NUMERO-teses.md | estrategista-postulatorio |
-  | 6 | Pesquisa | teses | $NUMERO-pesquisa.md | pesquisa JusMCP + consolidador-pesquisa |
+  | 6 | Pesquisa | teses | $NUMERO-pesquisa.md | pesquisador-jusmcp |
   | 7 | Prognóstico | teses+prova+pesquisa | $NUMERO-prognostico.md | prognosticador |
   | 8 | Parecer | todos os artefatos | $NUMERO-parecer.md | relator-parecer |
 </contratos_dados>
@@ -78,11 +92,12 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
   <passo numero="0" nome="Resolver caminhos e papel">
     Receber $ARGUMENTS.
     1. Determinar $WORKSPACE: se pasta → $WORKSPACE = $ARGUMENTS; se arquivo → pasta pai.
-       Se vier um PDF solto, criar data/processos/$NUMERO/ e movê-lo para lá.
+       Se vier um PDF solto (fora de data/processos/), criar data/processos/$NUMERO/ e
+       COPIAR o arquivo para lá (nunca mover — o original do usuário permanece intacto).
     2. Extrair $NUMERO do nome (padrão CNJ NNNNNNN-NN.AAAA.J.RR.OOOO; se não houver, usar o
        nome da pasta/arquivo).
     3. Confirmar PAPEL (defensor/advogado) e POLO representado (autor/réu/executado). Se ausente,
-       perguntar ao usuário.
+       perguntar ao usuário via AskUserQuestion.
     4. Criar TodoWrite com as etapas 1–8.
   </passo>
 
@@ -130,10 +145,16 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
   </passo>
 
   <passo numero="6" nome="Pesquisa de jurisprudência (JusMCP)">
-    Task → general-purpose, model sonnet, tools incluindo mcp__JusMCP__pesquisar_documentos:
-    - Passo 1: Read .claude/agents/pesquisa/consolidador-pesquisa.md
-    - Para cada tese FORTE/MÉDIA do mapa, pesquisar no JusMCP priorizando níveis A/B
-    - Consolidar e salvar em $WORKSPACE/$NUMERO-pesquisa.md (com [REF:N] por fonte)
+    Task → general-purpose, model sonnet, tools: Read Write mcp__JusMCP__pesquisar_documentos
+    mcp__JusMCP__obter_documento mcp__JusMCP__obter_resultado_pesquisa
+    mcp__JusMCP__buscar_legislacao mcp__JusMCP__listar_overruling_por_tema:
+    - Passo 1: Read .claude/agents/pesquisa/pesquisador-jusmcp.md
+      → O agent define o PRÉ-CHECK de disponibilidade e a degradação formal.
+    - Injetar INLINE as teses FORTE/MÉDIA do mapa + tribunal de origem
+    - Salvar em $WORKSPACE/$NUMERO-pesquisa.md (fontes numeradas [REF:N], níveis A–E)
+    Validar sinalizadores: "# Pesquisa de Jurisprudência" ... "Pesquisa de jurisprudência concluída."
+    Se status = "PESQUISA INDISPONÍVEL" → seguir contingência se_jusmcp_indisponivel
+    (pipeline continua; jurisprudência do parecer sai [VERIFY]).
   </passo>
 
   <passo numero="7" nome="Prognóstico">

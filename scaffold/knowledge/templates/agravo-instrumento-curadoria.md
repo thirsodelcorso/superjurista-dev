@@ -19,8 +19,8 @@ Espera deferimento.
 Manaus, data registrada no sistema.
 
 \[assinado digitalmente\]  
-**ADRIANA MONTEIRO RAMOS TENUTA**  
-*Defensora Pública*  
+**{NOME_DEFENSOR}**  
+*Defensor(a) Público(a)*  
 **RAZÕES RECURSAIS**
 
 AGRAVANTE: {ASSISTIDO}  
@@ -62,7 +62,7 @@ Espera deferimento.
 Manaus, data registrada no sistema.
 
 \[assinado digitalmente\]  
-**ADRIANA MONTEIRO RAMOS TENUTA**  
-*Defensora Pública*
+**{NOME_DEFENSOR}**  
+*Defensor(a) Público(a)*
 
 [^1]:  Assis, Araken de. Manual dos Recursos \- Ed. 2021, Revista dos Tribunais, PARTE I \- TEORIA GERAL DOS RECURSOS

@@ -135,7 +135,7 @@ Voce pode abrir qualquer um desses arquivos em um editor de texto ou no proprio 
 
 O SuperJurista esta em desenvolvimento ativo. Se encontrar algum problema ou tiver sugestoes:
 
-- Abra um chamado em: https://github.com/georgemarmelstein/superjurista-dev/issues
+- Abra um chamado em: https://github.com/thirsodelcorso/superjurista-dev/issues
 - Descreva o problema encontrado, incluindo o comando executado e a mensagem de erro (se houver)
 
 Novas funcionalidades e melhorias sao adicionadas regularmente. Mantenha o sistema atualizado para ter acesso as versoes mais recentes.

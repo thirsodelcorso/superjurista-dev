@@ -144,6 +144,8 @@ pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
 | `jurisdf-tjdft` | Jurisprudência do TJDFT | Similar ao CJF |
 | `infojuris-cnj` | InfoJuris do CNJ | Precedentes qualificados |
 | `JusMCP` | Jurisprudência STF/STJ/TJs com níveis de autoridade A–E | Linguagem natural; usado por `/analisar-processo` e `/minutar-peticao` para pesquisa e verificação citação-a-citação |
+
+> **PRÉ-REQUISITO do Jurista Experiente:** o `JusMCP` é um servidor MCP remoto (jusratio.com.br) que NÃO é instalado por este plugin — deve ser configurado pelo usuário no Claude Code. Sem ele, `/analisar-processo` e `/minutar-peticao` continuam funcionando, mas degradam com transparência: toda jurisprudência sai marcada `[VERIFY]` (não verificada), o componente de citações do score de confiança zera e o resumo final exibe aviso de conferência manual obrigatória.
 | `claude-in-chrome` | Automação browser (sessão PJE, login) | Controle nativo do navegador |
 
 ## Convenções

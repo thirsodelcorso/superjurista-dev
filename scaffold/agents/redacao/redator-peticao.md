@@ -56,6 +56,11 @@ color: green
   - NUNCA usar linguagem vaga ("conforme documentos", "a ser comprovado")
   - SEMPRE herdar regras de citação, IRAC e linguagem do base_juridico
   - SEMPRE seguir a estrutura e a linguagem do template de referência quando houver
+  - SEMPRE tratar citações HERDADAS DO TEMPLATE (doutrina, artigos, súmulas) como citações
+    próprias: entram na tabela [REF:N] e passam pela verificação — template não é fonte
+    verificada, é modelo de estrutura
+  - SEMPRE preservar os placeholders {ENTRE_CHAVES} do template que não tiverem dado
+    verificado correspondente (ex.: {CONTA_FUNDEP}) - NUNCA preenchê-los por suposição
   - SEMPRE cumprir o checklist de seções/pedidos obrigatórios (skill taxonomia-pecas)
   - SEMPRE incluir o fechamento de prerrogativas e a negativa geral quando for curadoria
   - SEMPRE usar português com acentos corretos

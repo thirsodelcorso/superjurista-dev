@@ -262,6 +262,9 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
         Python 3.8+ com: pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
         Tesseract OCR com pacote de idioma portugues
         Poppler (Windows: extrair para ~/poppler/)
+        JusMCP (servidor MCP remoto) -- PRE-REQUISITO de /analisar-processo e
+          /minutar-peticao para verificacao de citacoes; sem ele os comandos degradam
+          e toda jurisprudencia sai marcada [VERIFY] (conferencia manual obrigatoria)
 
       Proximo passo: capture a sessao do PJE com /capturar-sessao-pje
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

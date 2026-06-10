@@ -170,7 +170,7 @@ PDF dos autos
   ├─ [agentes: probatica-haack / probatica-pearl / detector-lacunas]
   │                                    análise probatória em modo postulatório  — EXISTENTES (variante)
   ├─ [agente: estrategista-postulatorio] teses + condições de cabimento + força — NOVO
-  ├─ [pesquisa: JusMCP]                jurisprudência por tese (autoridade A–E) — MCP JÁ DISPONÍVEL
+  ├─ [pesquisa: JusMCP]                jurisprudência por tese (autoridade A–E) — MCP externo (PRÉ-REQUISITO)
   ├─ [agente: consolidador-pesquisa]   síntese das fontes                       — EXISTENTE
   ├─ [agente: prognosticador]          cenários + probabilidade qualitativa     — NOVO
   └─ [agente: relator-parecer]         parecer final consolidado                — NOVO (derivado do relator-marmelstein)
@@ -183,7 +183,7 @@ Parecer (ou autos)
   │
   ├─ [planner determinístico]          tabela fase→peça→teses + checklist        — NOVO (porte do piece_planner do JurisAI)
   ├─ [seleção de template]             20 modelos DPE + genéricos                — MIGRADO do JurisAI
-  ├─ [pesquisa: JusMCP]                jurisprudência dirigida por tese          — MCP JÁ DISPONÍVEL
+  ├─ [pesquisa: JusMCP]                jurisprudência dirigida por tese          — MCP externo (PRÉ-REQUISITO)
   ├─ [agente: redator-peticao]         IRAC + [REF:N] + linguagem forense        — NOVO (prompts do JurisAI)
   ├─ [agente: verificador-citacoes]    citação-a-citação vs JusMCP/lei/autos     — NOVO (evolução do verificador-fontes)
   │     └─ não verificado & ciclos < 2 → re-pesquisa dirigida (loop)

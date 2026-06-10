@@ -17,8 +17,8 @@ Espera deferimento
 Manaus, data registrada no sistema.
 
 \[assinado digitalmente\]  
-**ADRIANA MONTEIRO RAMOS TENUTA**  
-*Defensora Pública*  
+**{NOME_DEFENSOR}**  
+*Defensor(a) Público(a)*  
 **EGRÉGIO TRIBUNAL DE JUSTIÇA**
 
 Processo nº {Processo}  
@@ -58,7 +58,7 @@ Por todo o exposto, requer que seja o presente recurso recebido, conhecido e pro
 1) Declarar a nulidade da …  
 2) Anular a …  
 3) Reformar a sentença, julgando …  
-4) Seja a parte apelada condenada ao pagamento de honorários sucumbenciais nos termos do art. 85, § 2º do CPC, a serem arbitrados por Vossa Excelência e revertidos em favor do FUNDEP, conta corrente 9229-0, Agência 3563-7, Banco do Brasil S/A., na forma do artigo 25, inciso XXXIX, da Lei Complementar Estadual nº 01/90. 
+4) Seja a parte apelada condenada ao pagamento de honorários sucumbenciais nos termos do art. 85, § 2º do CPC, a serem arbitrados por Vossa Excelência e revertidos em favor do FUNDEP, conta corrente {CONTA_FUNDEP}, Agência {AGENCIA_FUNDEP}, Banco do Brasil S/A., na forma do artigo 25, inciso XXXIX, da Lei Complementar Estadual nº 01/90. 
 
 Em tempo, reitera-se necessidade de observância às prerrogativas legais da Defensoria Pública, especialmente atuação independente de mandato, intimação pessoal com a integralidade do processo (art. 4º, § 2º do Provimento n.º 143/2008 da CGJ) e contagem de prazo em dobro, nos termos do art. 128 da LC 80/94 e do art. 34 da LCE 01/90.
 
@@ -67,6 +67,6 @@ Espera deferimento.
 Manaus, data registrada no sistema.
 
 \[assinado digitalmente\]  
-**ADRIANA MONTEIRO RAMOS TENUTA**  
-*Defensora Pública*
+**{NOME_DEFENSOR}**  
+*Defensor(a) Público(a)*
 

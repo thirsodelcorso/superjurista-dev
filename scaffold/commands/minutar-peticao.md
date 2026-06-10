@@ -1,7 +1,7 @@
 ---
 description: Gera a minuta da peça cabível à fase, com teses e jurisprudência verificadas, a partir do parecer/autos
 argument-hint: <numero-ou-pasta-do-processo> [--peca <peça>] [--teses <id,id,...>]
-allowed-tools: Read Write Task TodoWrite Bash Glob
+allowed-tools: Read Write Task TodoWrite Bash Glob AskUserQuestion
 ---
 
 # Orquestrador: Minutar Petição
@@ -51,14 +51,31 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
     Se o score de confiança < 0.5: destacar no resumo final e recomendar revisão reforçada;
     NÃO bloquear a entrega (decisão é do profissional).
   </se_score_baixo>
+  <se_jusmcp_indisponivel>
+    Se o JusMCP não estiver configurado/acessível (pré-requisito — ver project-claude.md):
+    NÃO interromper o pipeline, mas degradar com transparência:
+    - Etapa 2: pesquisador-jusmcp produz status "PESQUISA INDISPONÍVEL"
+    - Etapa 3: o redator cita apenas fundamentos legais, todos com [VERIFY]
+    - Etapa 4: o verificador marca TODAS as citações como INCONCLUSIVAS ([VERIFY]) e o
+      score de confiança reflete (componente de citações = 0)
+    - Etapa 5: o resumo final DEVE exibir: "⚠️ Citações NÃO verificadas — JusMCP
+      indisponível. Conferência manual de TODAS as referências é obrigatória."
+  </se_jusmcp_indisponivel>
 </contingencias>
+
+<aviso_privacidade>
+  AVISO OPERACIONAL (LGPD/segredo de justiça): o texto dos autos e do parecer é injetado no
+  contexto do modelo de linguagem para redação. Não use este pipeline em processos sob
+  segredo de justiça sem avaliar a política de tratamento de dados aplicável. Os artefatos
+  ficam em data/processos/ (local, não versionado — ver .gitignore).
+</aviso_privacidade>
 
 <contratos_dados>
   | # | Etapa | Entrada | Saída | Agent/Skill |
   |---|-------|---------|-------|-------------|
   | 0 | Preparação | $ARGUMENTS + flags | $WORKSPACE, $NUMERO, $PECA, $TESES | — |
   | 1 | Seleção peça/template | fase + teses | $PECA, $TEMPLATE | skill taxonomia-pecas |
-  | 2 | Pesquisa por tese | teses selecionadas | $NUMERO-pesquisa-peca.md | pesquisa JusMCP |
+  | 2 | Pesquisa por tese | teses selecionadas | $NUMERO-pesquisa-peca.md | pesquisador-jusmcp |
   | 3 | Redação | template+teses+fatos+pesquisa | $NUMERO-minuta.md | redator-peticao |
   | 4 | Verificação | minuta + checklist | $NUMERO-verificacao.md | verificador-citacoes |
   | 5 | Finalização | minuta + verificação | resumo + gate | — |
@@ -90,10 +107,15 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
   </passo>
 
   <passo numero="2" nome="Pesquisa de jurisprudência por tese">
-    Task → general-purpose, model sonnet, com mcp__JusMCP__pesquisar_documentos:
-    - Para cada tese de $TESES, pesquisar no JusMCP priorizando níveis A/B
+    Task → general-purpose, model sonnet, tools: Read Write mcp__JusMCP__pesquisar_documentos
+    mcp__JusMCP__obter_documento mcp__JusMCP__obter_resultado_pesquisa
+    mcp__JusMCP__buscar_legislacao mcp__JusMCP__listar_overruling_por_tema:
+    - Passo 1: Read .claude/agents/pesquisa/pesquisador-jusmcp.md
+      → O agent define o PRÉ-CHECK de disponibilidade e a degradação formal.
+    - Injetar INLINE as teses de $TESES + tribunal de origem
     - Salvar em $WORKSPACE/$NUMERO-pesquisa-peca.md (fontes numeradas [REF:N])
-    (Se já houver $NUMERO-pesquisa.md do parecer, reaproveitar e complementar.)
+    (Se já houver $NUMERO-pesquisa.md do parecer, injetá-lo também para reaproveitar.)
+    Se status = "PESQUISA INDISPONÍVEL" → seguir contingência se_jusmcp_indisponivel.
   </passo>
 
   <passo numero="3" nome="Redigir minuta">
@@ -107,10 +129,15 @@ allowed-tools: Read Write Task TodoWrite Bash Glob
   </passo>
 
   <passo numero="4" nome="Verificar citações e calcular confiança">
-    Task → general-purpose, model opus, com mcp__JusMCP__* e WebSearch:
+    Task → general-purpose, model opus, tools: Read Write mcp__JusMCP__pesquisar_documentos
+    mcp__JusMCP__obter_documento mcp__JusMCP__obter_resultado_pesquisa
+    mcp__JusMCP__buscar_legislacao WebSearch:
     - Passo 1: Read .claude/agents/revisao/verificador-citacoes.md
+      → As tools acima espelham as declaradas no frontmatter do agent.
     - Injetar INLINE a minuta e o checklist da peça (skill taxonomia-pecas)
     - Verificar cada [REF:N], aplicar [VERIFY] ao não confirmado, calcular o score
+    - Se o JusMCP estiver indisponível: TODAS as citações ficam INCONCLUSIVAS ([VERIFY])
+      e o componente de citações do score = 0 (contingência se_jusmcp_indisponivel)
     - Salvar em $WORKSPACE/$NUMERO-verificacao.md
     Validar sinalizadores da etapa 4.
   </passo>
