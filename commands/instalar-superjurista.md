@@ -243,7 +243,7 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
 
       Componentes instalados:
         18 comandos (pipelines e utilitarios, incluindo /analisar-processo e /minutar-peticao)
-        55 agentes (8 categorias: analise, estrategia, extracao, pesquisa, redacao, revisao, lista-trf, tribunal)
+        56 agentes (8 categorias: analise, estrategia, extracao, pesquisa, redacao, revisao, lista-trf, tribunal)
         7 skills (download PJE, conversao PDF, taxonomia de pecas, captura sessao, analise probatoria, erro medico, terminal)
         2 servidores MCP locais (TJSC eProc, TCU Jurisprudencia)
         Base de conhecimento juridico (base_juridico + 25 templates de pecas)
