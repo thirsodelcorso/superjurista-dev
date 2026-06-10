@@ -32,16 +32,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ├── agents/             # SUBAGENTES por categoria
 │   ├── extracao/       # linha-tempo, relator, seletor-documentos, super-conversor
 │   ├── analise/        # marmelstein, haack, pearl, embargos, hootly, probatica
+│   ├── estrategia/     # identificador-fase, estrategista-postulatorio, prognosticador, relator-parecer
 │   ├── pesquisa/       # bnp, cjf, julia, consolidador
-│   ├── redacao/        # redator-minuta-robustecida
-│   ├── revisao/        # verificadores (calculos, honorarios, remessa, fontes)
+│   ├── redacao/        # redator-peticao, redator-minuta-robustecida
+│   ├── revisao/        # verificadores (calculos, honorarios, remessa, fontes, citacoes)
 │   └── lista-trf/      # agentes para análise de listas de julgamento
 ├── skills/             # CONHECIMENTO + SCRIPTS
 │   ├── pje-download/   # API REST do PJE (scripts Python)
 │   ├── converter-pdf/  # Conversão PDF→TXT com OCR híbrido
+│   ├── taxonomia-pecas/      # Tabela fase→peça→tese + checklists (determinístico)
 │   ├── capturar-sessao-pje/  # Captura sessão via Chrome MCP
 │   ├── criar-mcp-precedente/ # Criação de MCPs de jurisprudência
 │   └── fork-terminal/  # Execução paralela em terminais
+├── knowledge/          # CONHECIMENTO JURÍDICO COMPARTILHADO
+│   ├── prompts/        # base_juridico.md (regras de citação, IRAC, prerrogativas)
+│   └── templates/      # 25 modelos de peças (DPE/AM + genéricos)
 └── mcp-servers/        # SERVIDORES MCP LOCAIS
     └── tjsc-eproc/     # Jurisprudência TJSC via eProc (público)
 
@@ -66,6 +71,13 @@ data/                   # SAÍDAS DO SISTEMA
 | `/pipeline-probatica` | Análise probabilística de provas (Haack/Pearl) |
 | `/pipeline-minutar-pdf` | PDF para sentença completa |
 | `/pipeline-revisao-minuta` | Revisão e validação final |
+
+### Jurista Experiente (atuação postulatória/defensorial — cível estadual)
+
+| Comando | Descrição |
+|---------|-----------|
+| `/analisar-processo` | Gera o Parecer do Jurista Experiente a partir do PDF dos autos (linha do tempo, fase, prova, teses, jurisprudência, prognóstico) |
+| `/minutar-peticao` | Gera a minuta da peça cabível à fase, com teses e citações verificadas (JusMCP) + score de confiança |
 
 ### Download e Conversão
 
@@ -131,6 +143,7 @@ pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
 | `tjsc-eproc` | Jurisprudência do TJSC (eProc) | `termo ou nao prox "frase" *wildcard` (case-insensitive) |
 | `jurisdf-tjdft` | Jurisprudência do TJDFT | Similar ao CJF |
 | `infojuris-cnj` | InfoJuris do CNJ | Precedentes qualificados |
+| `JusMCP` | Jurisprudência STF/STJ/TJs com níveis de autoridade A–E | Linguagem natural; usado por `/analisar-processo` e `/minutar-peticao` para pesquisa e verificação citação-a-citação |
 | `claude-in-chrome` | Automação browser (sessão PJE, login) | Controle nativo do navegador |
 
 ## Convenções

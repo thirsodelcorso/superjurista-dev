@@ -113,7 +113,7 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
     <acao>
       1. **Criar diretórios base:**
          ```bash
-         mkdir -p .claude/commands .claude/agents .claude/skills .claude/mcp-servers
+         mkdir -p .claude/commands .claude/agents .claude/skills .claude/mcp-servers .claude/knowledge
          ```
 
       2. **Copiar conteúdo conforme $MODO_COPIA:**
@@ -125,6 +125,7 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
            cp -r "${CLAUDE_PLUGIN_ROOT}/scaffold/agents/"* .claude/agents/
            cp -r "${CLAUDE_PLUGIN_ROOT}/scaffold/skills/"* .claude/skills/
            cp -r "${CLAUDE_PLUGIN_ROOT}/scaffold/mcp-servers/"* .claude/mcp-servers/
+           cp -r "${CLAUDE_PLUGIN_ROOT}/scaffold/knowledge/"* .claude/knowledge/
            ```
          </se_modo_sobrescrever_ou_instalar>
 
@@ -135,6 +136,7 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
            cp -rn "${CLAUDE_PLUGIN_ROOT}/scaffold/agents/"* .claude/agents/
            cp -rn "${CLAUDE_PLUGIN_ROOT}/scaffold/skills/"* .claude/skills/
            cp -rn "${CLAUDE_PLUGIN_ROOT}/scaffold/mcp-servers/"* .claude/mcp-servers/
+           cp -rn "${CLAUDE_PLUGIN_ROOT}/scaffold/knowledge/"* .claude/knowledge/
            ```
            (A flag -n / --no-clobber impede sobrescrita de arquivos existentes)
          </se_modo_mesclar>
@@ -151,6 +153,7 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
          ls .claude/agents/analise/*.md > /dev/null 2>&1 && echo "agents OK" || echo "agents FALHOU"
          ls .claude/skills/pje-download/SKILL.md > /dev/null 2>&1 && echo "skills OK" || echo "skills FALHOU"
          ls .claude/mcp-servers/tjsc-eproc/server.py > /dev/null 2>&1 && echo "mcp-servers OK" || echo "mcp-servers FALHOU"
+         ls .claude/knowledge/prompts/base_juridico.md > /dev/null 2>&1 && echo "knowledge OK" || echo "knowledge FALHOU"
          ```
          Se qualquer um falhou → reportar erro e parar
     </acao>
@@ -213,12 +216,13 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
 
     <acao>
       ```bash
-      mkdir -p data/sentenca data/decisao
+      mkdir -p data/sentenca data/decisao data/processos
       ```
 
       Esses diretórios são onde os processos baixados e seus artefatos serão armazenados:
       - `data/sentenca/` - processos aguardando sentença
       - `data/decisao/` - processos aguardando decisão interlocutória
+      - `data/processos/` - processos para análise/petição (Jurista Experiente)
     </acao>
   </fase>
 
@@ -238,18 +242,21 @@ allowed-tools: Bash Read Write AskUserQuestion Glob
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
       Componentes instalados:
-        16 comandos (pipelines e utilitarios)
-        49 agentes (7 categorias: analise, extracao, pesquisa, redacao, revisao, lista-trf, tribunal)
-        6 skills (download PJE, conversao PDF, captura sessao, analise probatoria, erro medico, terminal)
-        2 servidores MCP (TJSC eProc, TCU Jurisprudencia)
+        18 comandos (pipelines e utilitarios, incluindo /analisar-processo e /minutar-peticao)
+        55 agentes (8 categorias: analise, estrategia, extracao, pesquisa, redacao, revisao, lista-trf, tribunal)
+        7 skills (download PJE, conversao PDF, taxonomia de pecas, captura sessao, analise probatoria, erro medico, terminal)
+        2 servidores MCP locais (TJSC eProc, TCU Jurisprudencia)
+        Base de conhecimento juridico (base_juridico + 25 templates de pecas)
 
       Estrutura criada:
         .claude/commands/    -- pipelines e comandos
         .claude/agents/      -- agentes especializados
         .claude/skills/      -- skills com scripts
         .claude/mcp-servers/ -- servidores MCP locais
+        .claude/knowledge/   -- prompt-base juridico e templates de pecas
         data/sentenca/       -- processos para sentenca
         data/decisao/        -- processos para decisao
+        data/processos/      -- processos para analise/peticao (Jurista Experiente)
 
       Dependencias externas necessarias:
         Python 3.8+ com: pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
@@ -277,6 +284,7 @@ FLUXO /instalar-superjurista:
   │  ${CLAUDE_PLUGIN_ROOT}/scaffold/agents/      → .claude/agents/
   │  ${CLAUDE_PLUGIN_ROOT}/scaffold/skills/      → .claude/skills/
   │  ${CLAUDE_PLUGIN_ROOT}/scaffold/mcp-servers/ → .claude/mcp-servers/
+  │  ${CLAUDE_PLUGIN_ROOT}/scaffold/knowledge/   → .claude/knowledge/
   │
   ▼
   FASE 3: Arquivos Raiz
@@ -286,7 +294,7 @@ FLUXO /instalar-superjurista:
   │
   ▼
   FASE 4: Estrutura de Dados
-  │  mkdir -p data/sentenca data/decisao
+  │  mkdir -p data/sentenca data/decisao data/processos
   │
   ▼
   FASE 5: Resumo
