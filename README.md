@@ -2,6 +2,8 @@
 
 Plugin de meta-ferramentas para criar e customizar sistemas agenticos judiciais com Claude Code. Inclui ferramentas para criar agentes, orquestradores, skills, teams e um scaffold completo do sistema SuperJurista -- um sistema de inteligencia aumentada para processamento de processos judiciais, construido com arquitetura de pipelines deterministicos.
 
+**Novidade desta versao:** o agente **Jurista Experiente** -- dois pipelines para a atuacao postulatoria/defensorial (Defensoria Publica e advocacia civel estadual): `/analisar-processo` gera um parecer completo dos autos (fase, provas, teses, jurisprudencia, prognostico) e `/minutar-peticao` gera a minuta da peca cabivel a fase, com verificacao citacao-a-citacao via JusMCP e score de confianca. Inclui 25 modelos reais de pecas (DPE/AM + genericos) e taxonomia deterministica fase-peca-tese.
+
 ## Instalacao
 
 ### Opcao 1: Dentro de uma sessao do Claude Code (recomendado)
@@ -94,11 +96,12 @@ npm update -g @anthropic-ai/claude-code
 
 O comando `/instalar-superjurista` gera um sistema judicial completo no projeto atual:
 
-- **16 pipelines e comandos** para processamento judicial (sentenca, embargos, pesquisa, revisao, etc.)
-- **~52 agentes especializados** em 7 categorias (extracao, analise, pesquisa, redacao, revisao, lista-trf, tribunal)
-- **6 skills de dominio** (download PJE, conversao PDF, analise probatoria, captura de sessao, etc.)
-- **2 servidores MCP** (TJSC eProc, TCU)
-- **Estrutura de dados pronta** (`data/sentenca/`, `data/decisao/`)
+- **18 pipelines e comandos** para processamento judicial (sentenca, embargos, pesquisa, revisao, analise de processo, minuta de peticao, etc.)
+- **~56 agentes especializados** em 8 categorias (extracao, analise, estrategia, pesquisa, redacao, revisao, lista-trf, tribunal)
+- **7 skills de dominio** (download PJE, conversao PDF, taxonomia de pecas, analise probatoria, captura de sessao, etc.)
+- **Base de conhecimento juridico** (`knowledge/`): prompt-base de citacao/IRAC e 25 templates de pecas (modelos DPE/AM de curadoria especial + genericos)
+- **2 servidores MCP locais** (TJSC eProc, TCU)
+- **Estrutura de dados pronta** (`data/sentenca/`, `data/decisao/`, `data/processos/`)
 - **CLAUDE.md e README.md** configurados para o projeto
 
 ### Estrutura gerada
@@ -106,31 +109,66 @@ O comando `/instalar-superjurista` gera um sistema judicial completo no projeto 
 ```
 projeto/
 ├── .claude/
-│   ├── commands/           # 16 pipelines e comandos
+│   ├── commands/           # 18 pipelines e comandos
 │   ├── agents/
 │   │   ├── analise/        # Marmelstein, Haack, Pearl, embargos, probatoria
+│   │   ├── estrategia/     # Identificador de fase, estrategista, prognosticador, relator de parecer
 │   │   ├── extracao/       # Linha do tempo, relator, conversor
 │   │   ├── lista-trf/      # 9 agentes para listas de julgamento
-│   │   ├── pesquisa/       # BNP, CJF, JULIA, consolidador
-│   │   ├── redacao/        # Redator de minutas
-│   │   ├── revisao/        # Verificadores (calculos, honorarios, fontes)
+│   │   ├── pesquisa/       # BNP, CJF, JULIA, JusMCP, consolidador
+│   │   ├── redacao/        # Redator de minutas, redator de peticoes
+│   │   ├── revisao/        # Verificadores (calculos, honorarios, fontes, citacoes)
 │   │   └── tribunal/       # Acusador, defensor, juiz mediador
 │   ├── skills/
 │   │   ├── pje-download/   # API REST do PJE (10 scripts Python)
 │   │   ├── converter-pdf/  # Conversao PDF para TXT com OCR hibrido
+│   │   ├── taxonomia-pecas/     # Tabela fase-peca-tese + checklists (deterministico)
 │   │   ├── analise-probatoria/  # Checklists por tipo de prova
 │   │   ├── capturar-sessao-pje/ # Captura sessao via Chrome MCP
 │   │   ├── analisador-erro-medico/ # Analise de erro medico
 │   │   └── fork-terminal/  # Execucao paralela em terminais
+│   ├── knowledge/
+│   │   ├── prompts/        # base_juridico.md (citacao, IRAC, prerrogativas)
+│   │   └── templates/      # 25 modelos de pecas (DPE/AM + genericos)
 │   └── mcp-servers/
 │       ├── tjsc-eproc/     # Jurisprudencia TJSC
 │       └── tcu-jurisprudencia/ # Jurisprudencia TCU
 ├── data/
 │   ├── sentenca/           # Processos para sentenca
-│   └── decisao/            # Processos para decisao
+│   ├── decisao/            # Processos para decisao
+│   └── processos/          # Processos para analise/peticao (Jurista Experiente)
 ├── CLAUDE.md               # Configuracao do projeto
 └── README.md               # Documentacao do projeto
 ```
+
+## Jurista Experiente (atuacao postulatoria/defensorial)
+
+Dois comandos transformam o PDF dos autos em parecer e minuta, na perspectiva de quem
+peticiona (Defensor Publico ou advogado), em causas civeis estaduais:
+
+| Comando | O que faz |
+|---------|-----------|
+| `/analisar-processo` | Gera o **Parecer do Jurista Experiente**: linha do tempo, fase processual e prazos, analise probatoria, teses com condicao de cabimento verificada, jurisprudencia (niveis de autoridade A-E), riscos, prognostico por cenarios e recomendacao da proxima peca |
+| `/minutar-peticao` | Gera a **minuta da peca cabivel a fase** (a escolha da peca e deterministica, por tabela fase-peca-tese), ancorada em 25 templates reais, com fundamentacao IRAC, citacoes verificadas `[REF:N]`, tags `[VERIFY]` no nao confirmado e score de confianca |
+
+Fluxo tipico (exemplo de curadoria especial):
+
+```
+/analisar-processo data/processos/0601122-24.2024.8.04.0001/autos.pdf
+# le o parecer, escolhe as teses
+/minutar-peticao 0601122-24.2024.8.04.0001 --teses nulidade_citacao_edital,negativa_geral
+```
+
+**Pre-requisito (verificacao de citacoes):** os dois comandos usam o **JusMCP**
+(servidor MCP remoto de jurisprudencia, https://jusratio.com.br) para pesquisa e
+verificacao citacao-a-citacao. Ele NAO e instalado por este plugin -- configure-o no seu
+Claude Code. Sem ele, os comandos continuam funcionando, mas degradam com transparencia:
+toda jurisprudencia sai marcada `[VERIFY]` (nao verificada) e o score de confianca reflete isso.
+
+**Aviso (LGPD/segredo de justica):** o texto dos autos e injetado no contexto do modelo
+de linguagem para analise e redacao. Nao use os pipelines em processos sob segredo de
+justica sem avaliar a politica de tratamento de dados aplicavel. Toda minuta gerada e
+produto de trabalho de IA: revisao por profissional habilitado e obrigatoria antes do protocolo.
 
 ## Framework
 
@@ -146,6 +184,11 @@ pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
 **Sistema (para OCR):**
 - Tesseract OCR com pacote de idioma portugues
 - Poppler (Windows: extrair para `~/poppler/`)
+
+**Servicos externos (opcionais por funcionalidade):**
+- **JusMCP** -- pre-requisito de `/analisar-processo` e `/minutar-peticao` para
+  verificacao de citacoes (sem ele, degradam para `[VERIFY]`)
+- Sessao PJE capturada (`/capturar-sessao-pje`) -- apenas para os comandos de download
 
 ## Licenca
 

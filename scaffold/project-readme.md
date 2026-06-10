@@ -2,11 +2,11 @@
 
 ## O que e o SuperJurista
 
-O SuperJurista e um sistema de inteligencia aumentada que auxilia magistrados e profissionais do Direito no processamento de demandas judiciais. Ele funciona como um assistente especializado dentro do Claude Code, capaz de ler processos, pesquisar precedentes, analisar provas e redigir minutas de sentenca -- tudo a partir de comandos simples.
+O SuperJurista e um sistema de inteligencia aumentada que auxilia magistrados, Defensores Publicos e advogados no processamento de demandas judiciais. Ele funciona como um assistente especializado dentro do Claude Code, capaz de ler processos, pesquisar precedentes, analisar provas, redigir minutas de sentenca e -- na perspectiva de quem peticiona -- gerar pareceres completos e minutas de pecas processuais, tudo a partir de comandos simples.
 
-O sistema automatiza as tarefas mais repetitivas do trabalho judicial: extrair informacoes dos autos, organizar linhas do tempo, buscar jurisprudencia relevante em bancos como o BNP (STF/STJ), CJF e JULIA (TRF5), e produzir analises juridicas estruturadas. O que antes exigia horas de leitura e pesquisa pode ser feito em minutos.
+O sistema automatiza as tarefas mais repetitivas do trabalho juridico: extrair informacoes dos autos, organizar linhas do tempo, identificar a fase processual e a peca cabivel, buscar jurisprudencia relevante em bancos como o BNP (STF/STJ), CJF, JULIA (TRF5) e JusMCP (STF/STJ/TJs), e produzir analises juridicas estruturadas. O que antes exigia horas de leitura e pesquisa pode ser feito em minutos.
 
-E importante destacar: o SuperJurista assiste, nao substitui. O magistrado mantem o controle integral sobre o resultado. Toda minuta gerada e uma proposta que deve ser revisada, ajustada e validada pelo julgador antes de qualquer utilizacao. O sistema e uma ferramenta de apoio -- a decisao final e sempre humana.
+E importante destacar: o SuperJurista assiste, nao substitui. O profissional mantem o controle integral sobre o resultado. Toda minuta gerada e uma proposta que deve ser revisada, ajustada e validada pelo magistrado, Defensor ou advogado responsavel antes de qualquer utilizacao. O sistema e uma ferramenta de apoio -- a decisao final e sempre humana.
 
 ## Pre-requisitos
 
@@ -25,6 +25,12 @@ Apos instalar o Python, execute o seguinte comando para instalar as bibliotecas 
 ```
 pip install requests beautifulsoup4 pdfplumber PyPDF2 pdf2image pytesseract
 ```
+
+5. **JusMCP** (apenas para o Jurista Experiente) -- servidor MCP remoto de pesquisa
+   jurisprudencial (https://jusratio.com.br), usado por `/analisar-processo` e
+   `/minutar-peticao` para pesquisar precedentes e verificar cada citacao. Configure-o
+   no seu Claude Code. Sem ele, os dois comandos continuam funcionando, mas toda
+   jurisprudencia sai marcada `[VERIFY]` (nao verificada) e exige conferencia manual.
 
 ## Primeiros passos
 
@@ -57,6 +63,24 @@ Siga este roteiro para processar seu primeiro caso:
 ## Comandos disponiveis
 
 Todos os comandos sao executados dentro do Claude Code, digitando `/` seguido do nome do comando.
+
+### Jurista Experiente -- parecer e peticao (Defensoria/advocacia civel)
+
+| Comando | O que faz | Exemplo de uso |
+|---------|-----------|----------------|
+| `/analisar-processo` | Analisa o PDF dos autos e gera o Parecer do Jurista Experiente: linha do tempo, fase e prazos, provas e lacunas, teses cabiveis, jurisprudencia com nivel de autoridade, riscos e prognostico | `/analisar-processo data/processos/0601122-24.2024.8.04.0001/autos.pdf` |
+| `/minutar-peticao` | Gera a minuta da peca cabivel a fase (contestacao, embargos, impugnacao, apelacao etc.), com teses selecionadas, citacoes verificadas e score de confianca | `/minutar-peticao 0601122-24.2024.8.04.0001 --teses nulidade_citacao_edital,negativa_geral` |
+
+O fluxo recomendado e: rodar `/analisar-processo`, ler o parecer, escolher as teses e
+entao rodar `/minutar-peticao`. Quando o usuario atua como Defensor Publico em curadoria
+especial, o sistema inclui automaticamente a negativa geral (art. 341, paragrafo unico,
+CPC), o pedido de gratuidade quando documentado e o fechamento com as prerrogativas da
+LC 80/94. A minuta sai com cabecalho de produto de trabalho de IA e aviso de revisao
+obrigatoria -- o sistema nunca protocola nada.
+
+Atencao (LGPD/segredo de justica): o texto dos autos e enviado ao modelo de linguagem
+para analise. Nao use estes comandos em processos sob segredo de justica sem avaliar a
+politica de tratamento de dados aplicavel.
 
 ### Processamento de sentencas
 
@@ -123,8 +147,20 @@ data/
 │   │   └── 0814624-(...)-fundamentacao.md # Minuta de fundamentacao
 │   └── 0005144-15.2026.4.05.8100/        # Outro processo
 │       └── ...
-└── decisao/                               # Processos aguardando decisao
-    └── ...                                # Mesma estrutura
+├── decisao/                               # Processos aguardando decisao
+│   └── ...                                # Mesma estrutura
+└── processos/                             # Jurista Experiente (parecer e peticao)
+    └── 0601122-24.2024.8.04.0001/
+        ├── autos.pdf                      # PDF dos autos (entrada)
+        ├── 0601122-(...).txt              # Texto extraido (OCR)
+        ├── 0601122-(...)-linha-tempo.md   # Cronologia processual
+        ├── 0601122-(...)-fase.md          # Fase e pecas cabiveis
+        ├── 0601122-(...)-teses.md         # Mapa de teses
+        ├── 0601122-(...)-pesquisa.md      # Jurisprudencia (JusMCP)
+        ├── 0601122-(...)-prognostico.md   # Cenarios e probabilidades
+        ├── 0601122-(...)-parecer.md       # PARECER consolidado
+        ├── 0601122-(...)-minuta.md        # MINUTA da peca (revisao obrigatoria)
+        └── 0601122-(...)-verificacao.md   # Verificacao de citacoes + score
 ```
 
 Cada processo recebe sua propria pasta, nomeada pelo numero CNJ completo. Dentro dela, o arquivo `processo.txt` contem o texto extraido dos autos (gerado automaticamente na etapa de download e conversao). Os demais arquivos sao os artefatos gerados pelo sistema: relatorio, analise e fundamentacao.
